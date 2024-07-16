@@ -1,0 +1,15 @@
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: skeleton_mern_rest-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo/data:/data/db
+      - ./mongo/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
+    environment:
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE:-skeleton}
+      # auth for admin/root
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-root}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-admin}
+    restart: always

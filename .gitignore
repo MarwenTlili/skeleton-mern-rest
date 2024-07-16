@@ -1,0 +1,8 @@
+# IDE
+.vscode
+
+# personal temporary folder
+**/tmp
+
+# mongdo
+mongo/data
