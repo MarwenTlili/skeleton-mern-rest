@@ -13,3 +13,18 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-root}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-admin}
     restart: always
+
+  backend:
+    build: ./backend
+    container_name: skeleton_mern_rest-backend
+    ports:
+      - ${BACKEND_PORT:-5000}:${BACKEND_PORT:-5000}
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - BACKEND_PORT=${BACKEND_PORT:-5000}
+      - MONGODB_URI=${MONGODB_URI:-mongodb://dev:dev@mongo:27017/skeleton}
+    volumes:
+      - ./backend:/usr/src/app
+    restart: always
+    depends_on:
+      - mongo

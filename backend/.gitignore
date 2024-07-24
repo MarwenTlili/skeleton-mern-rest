@@ -1,0 +1,8 @@
+# deps
+node_modules
+
+# distribution
+dist
+
+# logging location
+logs
