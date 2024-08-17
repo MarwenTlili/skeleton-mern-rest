@@ -1,8 +1,10 @@
-import User, { IUser } from "../models/user.model";
+import IUser from "../interfaces/user.interface";
+import { IUserService } from "../interfaces/userService.interface";
+import User from "../models/user.model";
 import CustomError from "../utils/CustomError";
 import { hashPassword } from "../utils/password";
 
-class UserService {
+class UserService implements IUserService {
   async create(data: Partial<IUser>): Promise<IUser> {
     const { name, email, password } = data;
 

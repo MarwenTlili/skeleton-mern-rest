@@ -34,3 +34,13 @@ docker logs skeleton_mern_rest-backend -f
 # interract with container
 docker exec -it skeleton_mern_rest-backend sh
 ```
+
+#### Testing backend
+
+```sh
+# jest
+npm i -D jest ts-jest @types/jest supertest @types/supertest
+npm i -D @shelf/jest-mongodb
+
+npm run build && npm test
+```

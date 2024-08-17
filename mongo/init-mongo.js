@@ -1,4 +1,5 @@
 const devDatabase = "skeleton";
+const testDatabase = "skeleton_test";
 
 const colors = {
   reset: "\x1b[0m",
@@ -26,6 +27,17 @@ const devUser = {
   ]
 };
 
+const testUser = {
+  user: "test",
+  pwd: "test",
+  roles: [
+    {
+      role: "readWrite",
+      db: testDatabase
+    }
+  ]
+}
+
 function createDatabaseAndUser(database, user) {
   const siblingDB = db.getSiblingDB(database);
 
@@ -43,7 +55,8 @@ function createDatabaseAndUser(database, user) {
 }
 
 try {
-  createDatabaseAndUser(devDatabase, devUser, false);
+  createDatabaseAndUser(devDatabase, devUser);
+  createDatabaseAndUser(testDatabase, testUser);
 } catch (e) {
   print(colorize(e, colors.red));
 }
