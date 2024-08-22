@@ -1,7 +1,7 @@
 import IUser from "./user.interface";
 
 export interface IUserService {
-  create(data: Partial<IUser>): Promise<IUser>;
+  create(data: Partial<IUser>): Promise<IUser | null>;
   getById(id: string): Promise<IUser | null>;
   findByIdentifier(identifier: string): Promise<IUser | null>;
   getAll(): Promise<IUser[]>;
