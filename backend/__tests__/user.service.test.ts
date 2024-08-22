@@ -1,55 +1,171 @@
-import User from '../src/models/user.model';
-import UserService from '../src/services/user.service';
-import { hashPassword } from '../src/utils/password';
-import CustomError from '../src/utils/CustomError';
+import mongoose from 'mongoose'
 
-/**
- * mocking: replace real functions, modules, or objects with simulated versions 
- * to control their behavior during tests.
- * This allows for testing units of code in isolation without relying on 
- * external dependencies or unpredictable factors.
- * why mocking: isolation, control, performance, consistency
- * types of mocking: manual mocks, automatic mocks, mock functions
- */
-jest.mock('../src/models/user.model');
-jest.mock('../src/utils/password');
+import User from '../src/models/user.model'
+import UserService from '../src/services/user.service'
+import CustomError from '../src/utils/CustomError'
 
 describe('UserService', () => {
   describe('create', () => {
     it('should create a user successfully', async () => {
-      const userData = { name: 'John Doe', email: 'john@example.com', password: 'password123' };
-      const hashedPassword = 'hashedPassword123';
+      const userData = { name: 'user1', email: 'user1@example.com', password: 'password123' }
+      const user = await UserService.create(userData)
 
-      (User.exists as jest.Mock).mockResolvedValueOnce(false).mockResolvedValueOnce(false);
-      (hashPassword as jest.Mock).mockResolvedValueOnce(hashedPassword);
-      (User.prototype.save as jest.Mock).mockResolvedValueOnce({ ...userData, password: hashedPassword });
-
-      const result = await UserService.create(userData);
-
-      expect(User.exists).toHaveBeenCalledWith({ name: userData.name });
-      expect(User.exists).toHaveBeenCalledWith({ email: userData.email });
-      expect(hashPassword).toHaveBeenCalledWith(userData.password);
-      expect(result).toEqual({ ...userData, password: hashedPassword });
-    });
+      expect(user).toHaveProperty('_id')
+      expect(user?.name).toBe('user1')
+      expect(user?.email).toBe('user1@example.com')
+    })
 
     it('should throw error if name already exists', async () => {
-      const userData = { name: 'John Doe', email: 'john@example.com', password: 'password123' };
+      const user1 = { name: 'user1', email: 'user1@example.com', password: 'password123' }
+      const user2 = { name: 'user1', email: 'userx@example.com', password: 'password123' }
 
-      (User.exists as jest.Mock).mockResolvedValueOnce(true);
+      await UserService.create(user1)
 
-      await expect(UserService.create(userData)).rejects.toThrow(CustomError);
-      await expect(UserService.create(userData)).rejects.toHaveProperty('statusCode', 409);
-    });
+      await expect(UserService.create(user2)).rejects.toThrow(
+        new CustomError('Name already exists', 409)
+      )
+    })
 
     it('should throw error if email already exists', async () => {
-      const userData = { name: 'John Doe', email: 'john@example.com', password: 'password123' };
+      const user1 = { name: 'user1', email: 'user1@example.com', password: 'password123' }
+      const user2 = { name: 'userx', email: 'user1@example.com', password: 'password123' }
 
-      (User.exists as jest.Mock).mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+      await UserService.create(user1)
 
-      await expect(UserService.create(userData)).rejects.toThrow(CustomError);
-      await expect(UserService.create(userData)).rejects.toHaveProperty('statusCode', 409);
-    });
-  });
+      await expect(UserService.create(user2)).rejects.toThrow(
+        new CustomError('Email already exists', 409)
+      )
+    })
+  })
 
-  // Add more tests for other methods...
-});
+  describe('getbyId', () => {
+    it('should return a user by id', async () => {
+      const user = new User({
+        name: 'user',
+        email: 'user@example.com',
+        password: 'password123'
+      })
+      await user.save()
+
+      const foundUser = await UserService.getById(user._id.toString())
+
+      expect(foundUser).not.toBeNull()
+      expect(foundUser?.name).toBe('user')
+      expect(foundUser?.email).toBe('user@example.com')
+    })
+
+    it('should return null if user does not exist', async () => {
+      const foundUser = await UserService.getById(new mongoose.Types.ObjectId().toString())
+      expect(foundUser).toBeNull()
+    })
+  })
+
+  describe('findByIdentifier', () => {
+    it('should return user by name', async () => {
+      const user = new User({
+        name: 'user',
+        email: 'user@example.com',
+        password: 'password123'
+      })
+      await user.save()
+
+      const foundUser = await UserService.findByIdentifier('user')
+
+      expect(foundUser).not.toBeNull()
+      expect(foundUser?.name).toBe('user')
+      expect(foundUser?.email).toBe('user@example.com')
+    })
+    it('should return user by email', async () => {
+      const user = new User({
+        name: 'user',
+        email: 'user@example.com',
+        password: 'password123'
+      })
+      await user.save()
+
+      const foundUser = await UserService.findByIdentifier('user@example.com')
+
+      expect(foundUser).not.toBeNull()
+      expect(foundUser?.name).toBe('user')
+      expect(foundUser?.email).toBe('user@example.com')
+    })
+    it('sould return null if user does not exist', async () => {
+      const foundUser = await UserService.findByIdentifier('nonexistent')
+
+      expect(foundUser).toBeNull()
+    })
+  })
+
+  describe('getAll', () => {
+    it('should return all users', async () => {
+      const user1 = new User({
+        name: 'user1',
+        email: 'user1@example.com',
+        password: 'password123',
+      })
+      const user2 = new User({
+        name: 'user2',
+        email: 'user2@example.com',
+        password: 'password123',
+      })
+      await user1.save()
+      await user2.save()
+
+      const users = await UserService.getAll()
+
+      expect(users.length).toBe(2)
+      expect(users[0].name).toBe('user1')
+      expect(users[1].name).toBe('user2')
+    })
+  })
+
+  describe('update', () => {
+    it('should update a user by id', async () => {
+      const user = new User({
+        name: 'user',
+        email: 'user@example.com',
+        password: 'password123',
+      })
+      await user.save()
+
+      const updatedUser = await UserService.update(user._id.toString(), {
+        name: 'user Updated',
+      })
+
+      expect(updatedUser).not.toBeNull()
+      expect(updatedUser?.name).toBe('user Updated')
+    })
+
+    it('should return null if user does not exist', async () => {
+      const updatedUser = await UserService.update(new mongoose.Types.ObjectId().toString(), {
+        name: 'nonexistent',
+      })
+
+      expect(updatedUser).toBeNull()
+    })
+  })
+
+  describe('delete', () => {
+    it('should delete a user by id', async () => {
+      const user = new User({
+        name: 'user',
+        email: 'user@example.com',
+        password: 'password123',
+      })
+      await user.save()
+
+      const deletedUser = await UserService.delete(user._id.toString())
+
+      expect(deletedUser).not.toBeNull()
+      expect(deletedUser?.name).toBe('user')
+
+      const foundUser = await UserService.getById(user._id.toString())
+      expect(foundUser).toBeNull()
+    })
+
+    it('should return null if user does not exist', async () => {
+      const deletedUser = await UserService.delete(new mongoose.Types.ObjectId().toString())
+      expect(deletedUser).toBeNull()
+    })
+  })
+})
