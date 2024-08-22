@@ -5,7 +5,7 @@ import CustomError from "../utils/CustomError";
 import { hashPassword } from "../utils/password";
 
 class UserService implements IUserService {
-  async create(data: Partial<IUser>): Promise<IUser> {
+  async create(data: Partial<IUser>): Promise<IUser | null> {
     const { name, email, password } = data;
 
     if (await User.exists({ name })) {
@@ -18,7 +18,14 @@ class UserService implements IUserService {
 
     data.password = await hashPassword(password!);
     const user = new User(data);
-    return user.save();
+    const savedUser = await user.save();
+
+    // Omit password from User Object
+    // Convert to plain object and remove password
+    const userObject = savedUser.toObject();
+    delete userObject.password;
+
+    return userObject as Omit<IUser, 'password'>;
   }
 
   async getById(id: string): Promise<IUser | null> {
