@@ -42,5 +42,8 @@ docker exec -it skeleton_mern_rest-backend sh
 npm i -D jest ts-jest @types/jest supertest @types/supertest
 npm i -D @shelf/jest-mongodb
 
-npm run build && npm test
+# run all tests (under __tests__/*)
+npm test
+# OR a single test file
+npm test -- __tests__/user.integration.test.ts
 ```
