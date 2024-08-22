@@ -4,7 +4,8 @@ module.exports = {
   testEnvironment: "node",
   testMatch: ['**/__tests__/**/*.test.ts'],
   setupFilesAfterEnv: ['./jest.setup.ts'],
+  // Transform TypeScript files using ts-jest
   transform: {
-    "^.+.tsx?$": ["ts-jest", {}],
+    "^.+.ts?$": ["ts-jest", {}],
   },
 };
