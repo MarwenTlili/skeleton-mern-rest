@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import CustomError from '../utils/CustomError';
 
 const errorMiddleware = (err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error(err.stack);
+  // console.error(err.stack);
+
   if (res.headersSent) {
     return next(err);
   }
