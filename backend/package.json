@@ -9,7 +9,7 @@
     "build": "tsc",
     "dev": "nodemon src/server.ts",
     "start": "node dist/server.js",
-    "test": "jest",
+    "test": "jest -i",
     "clear": "rm -r dist/* || true"
   },
   "author": "MarwenTlili",
