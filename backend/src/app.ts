@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import { API_VERSION } from './config/constants';
 import userRoutes from './routes/user.routes';
+import authRoutes from './routes/auth.routes';
 import errorMiddleware from './middlewares/error.middleware';
 import notFoundMiddleware from './middlewares/notFound.middleware';
 
@@ -38,6 +39,7 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 app.use(`/api/${API_VERSION}/users`, userRoutes);
+app.use(`/api/${API_VERSION}/auth`, authRoutes);
 
 // 404 Error Handler
 app.use(notFoundMiddleware);
