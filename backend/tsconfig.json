@@ -9,12 +9,14 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "types": [
+      "node",
       "jest"
     ]
   },
   "include": [
     "src/**/*.ts",
-    "__tests__/**/*.ts"
+    "__tests__/**/*.ts",
+    "jest.setup.ts"
   ],
   "exclude": [
     "node_modules",
