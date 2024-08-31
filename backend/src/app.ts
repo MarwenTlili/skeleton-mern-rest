@@ -3,6 +3,7 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import cors from 'cors';
 import { API_VERSION } from './config/constants';
+import metadataRoutes from './routes/metadata.routes';
 import userRoutes from './routes/user.routes';
 import authRoutes from './routes/auth.routes';
 import errorMiddleware from './middlewares/error.middleware';
@@ -38,6 +39,7 @@ app.use(morgan('dev'));
 
 app.use(express.json());
 
+app.use(`/api/${API_VERSION}/`, metadataRoutes);
 app.use(`/api/${API_VERSION}/users`, userRoutes);
 app.use(`/api/${API_VERSION}/auth`, authRoutes);
 
