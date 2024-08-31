@@ -48,6 +48,11 @@ class UserService implements IUserService {
   }
 
   async update(id: string, data: Partial<IUser>): Promise<IUser | null> {
+    const { password } = data;
+    if (password) {
+      const hashedPassword = await hashPassword(password);
+      data.password = hashedPassword;
+    }
     return await User.findByIdAndUpdate(id, data, { new: true });
   }
 
