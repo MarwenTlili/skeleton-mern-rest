@@ -34,11 +34,6 @@ curl -X POST http://localhost:5000/api/v1/auth/login \
   -d '{"identifier": "user", "password": "user"}' \
   | json_pp
 
-{
-  "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2Y2RhNmQ2ZmM5MWM0NjZkYzA1ZTY2ZSIsImlhdCI6MTcyNTEyMzMyNSwiZXhwIjoxNzI1MjA5NzI1fQ.0vrj53FUF36EK6Pl0P0J4KeLUSyA1O-x6htvP0bijmw",
-  "refreshToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2Y2RhNmQ2ZmM5MWM0NjZkYzA1ZTY2ZSIsImlhdCI6MTcyNTEyMzMyNSwiZXhwIjoxNzI1NzI4MTI1fQ.vsdlSbRUWQEhxl8M4IWOEOEZHFtKbhEF_hEx_dj4pZs"
-}
-
 # REFRESH_TOKEN from register or login
 # returns {accessToken, refreshToken}
 curl -X POST http://localhost:5000/api/v1/auth/refresh-tokens \
