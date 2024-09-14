@@ -3,7 +3,7 @@ import app from '../src/app'
 import mongoose from 'mongoose'
 
 describe('User API', () => {
-  describe('create', () => {
+  describe('GET /api/v1/users', () => {
     it('should create a new user', async () => {
       const userData = { name: 'user', email: 'user@example.com', password: 'securepassword' }
 
@@ -25,7 +25,7 @@ describe('User API', () => {
     })
   })
 
-  describe('GET /users/:id', () => {
+  describe('GET /api/v1/users/:id', () => {
     it('should return a user by ID', async () => {
       const response = await request(app)
         .post('/api/v1/users')
@@ -51,7 +51,7 @@ describe('User API', () => {
     })
   })
 
-  describe('GET /users', () => {
+  describe('GET /api/v1/users', () => {
     it('should return all users', async () => {
       await request(app).post('/api/v1/users').send({ name: 'User One', email: 'one@example.com', password: '123456' });
       await request(app).post('/api/v1/users').send({ name: 'User Two', email: 'two@example.com', password: '123456' });
@@ -63,7 +63,7 @@ describe('User API', () => {
     })
   })
 
-  describe('PUT /users/:id', () => {
+  describe('PUT /api/v1/users/:id', () => {
     it('should update a user successfully', async () => {
       const userRes = await request(app)
         .post('/api/v1/users')
@@ -93,7 +93,7 @@ describe('User API', () => {
     })
   })
 
-  describe('DELETE /users/:id', () => {
+  describe('DELETE /api/v1/users/:id', () => {
     it('should delete a user successfully', async () => {
       const userRes = await request(app)
         .post('/api/v1/users')
