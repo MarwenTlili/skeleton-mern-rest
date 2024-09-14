@@ -25,6 +25,9 @@ services:
       - MONGODB_URI=${MONGODB_URI:-mongodb://dev:dev@mongo:27017/skeleton}
     volumes:
       - ./backend:/usr/src/app
+      # Named volume or Anonymous volume, 
+      # container-specific directories to avoid conflicts with the host system.
+      - /usr/src/app/node_modules
     restart: always
     depends_on:
       - mongo
