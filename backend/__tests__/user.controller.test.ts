@@ -45,4 +45,118 @@ describe('UserController', () => {
       expect(res.body).toHaveProperty('message', 'Name already exists')
     })
   })
+
+  describe('getById', () => {
+    it('should return a user when found', async () => {
+      (userService.getById as jest.Mock).mockResolvedValueOnce({ id: '1', name: 'user' });
+
+      const response = await request(app).get('/api/v1/users/1');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({ id: '1', name: 'user' });
+      expect(userService.getById).toHaveBeenCalledWith('1');
+    })
+
+    it('should return 404 when user is not found', async () => {
+      (userService.getById as jest.Mock).mockResolvedValueOnce(null);
+      const response = await request(app).get('/api/v1/users/1');
+      expect(response.status).toBe(404);
+      expect(response.body.message).toBe('User not found');
+    })
+
+    it('should return 500 when there is an error', async () => {
+      (userService.getById as jest.Mock).mockRejectedValueOnce(new Error('Error'));
+
+      const response = await request(app).get('/api/v1/users/1');
+
+      expect(response.status).toBe(500);
+      expect(response.body.message).toBe('Error');
+    })
+  })
+
+  describe('getAll', () => {
+    it('should return a list of users', async () => {
+      (userService.getAll as jest.Mock).mockResolvedValueOnce([{ id: '1', name: 'user' }]);
+
+      const response = await request(app).get('/api/v1/users');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual([{ id: '1', name: 'user' }]);
+      expect(userService.getAll).toHaveBeenCalled();
+    })
+
+    it('should return 500 when there is an error', async () => {
+      (userService.getAll as jest.Mock).mockRejectedValueOnce(new Error('Error'));
+
+      const response = await request(app).get('/api/v1/users');
+
+      expect(response.status).toBe(500);
+      expect(response.body.message).toBe('Error');
+    })
+  })
+
+  describe('update', () => {
+    it('should update a user successfully', async () => {
+      (userService.update as jest.Mock).mockResolvedValueOnce({ id: '1', name: 'user - updated' });
+
+      const response = await request(app)
+        .put('/api/v1/users/1')
+        .send({ name: 'user - updated' });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({ id: '1', name: 'user - updated' });
+      expect(userService.update).toHaveBeenCalledWith('1', { name: 'user - updated' });
+    })
+
+    it('should return 404 when user is not found', async () => {
+      (userService.update as jest.Mock).mockResolvedValueOnce(null);
+
+      const response = await request(app)
+        .put('/api/v1/users/1')
+        .send({ name: 'user - updated' });
+
+      expect(response.status).toBe(404);
+      expect(response.body.message).toBe('User not found');
+    })
+
+    it('should return 500 when there is an error', async () => {
+      (userService.update as jest.Mock).mockRejectedValueOnce(new Error('Error'));
+
+      const response = await request(app)
+        .put('/api/v1/users/1')
+        .send({ name: 'user - updated' });
+
+      expect(response.status).toBe(500);
+      expect(response.body.message).toBe('Error');
+    })
+  })
+
+  describe('delete', () => {
+    it('should delete a user successfully', async () => {
+      (userService.delete as jest.Mock).mockResolvedValueOnce({ id: '1' });
+
+      const response = await request(app).delete('/api/v1/users/1');
+
+      expect(response.status).toBe(204);
+      expect(userService.delete).toHaveBeenCalledWith('1');
+    })
+
+    it('should return 404 when user is not found', async () => {
+      (userService.delete as jest.Mock).mockResolvedValueOnce(null);
+
+      const response = await request(app).delete('/api/v1/users/1');
+
+      expect(response.status).toBe(404);
+      expect(response.body.message).toBe('User not found');
+    })
+
+    it('should return 500 when there is an error', async () => {
+      (userService.delete as jest.Mock).mockRejectedValueOnce(new Error('Error'));
+
+      const response = await request(app).delete('/api/v1/users/1');
+
+      expect(response.status).toBe(500);
+      expect(response.body.message).toBe('Error');
+    })
+  })
 })
