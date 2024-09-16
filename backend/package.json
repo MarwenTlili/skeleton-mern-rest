@@ -10,7 +10,7 @@
     "dev": "nodemon src/server.ts",
     "seed": "ts-node src/seeds/seed.ts",
     "start": "node dist/server.js",
-    "test": "jest -i",
+    "test": "jest -i --detectOpenHandles",
     "clear": "rm -r dist/* || true"
   },
   "author": "MarwenTlili",
