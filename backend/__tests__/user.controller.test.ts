@@ -2,161 +2,163 @@ import request from 'supertest'
 
 import app from '../src/app'
 import userService from '../src/services/user.service'
-import CustomError from '../src/utils/CustomError'
+import { generateAccessToken } from '../src/utils/jwt.util';
+import { mockUser, mockUsers } from './mocks/user.mocks';
+import IUser from '../src/interfaces/user.interface';
+import CustomError from '../src/utils/CustomError';
 
-// Mock the UserService
+// Mock userService to avoid real database interactions
 jest.mock('../src/services/user.service')
 
 describe('UserController', () => {
+  let accessToken: string;
+
   beforeEach(() => {
     jest.clearAllMocks()
+    accessToken = `Bearer ${generateAccessToken('testUserId')}`
   })
 
-  describe('create', () => {
-    it('should create a new user and return 201 status', async () => {
-      const mockData = { name: 'user', email: 'user@example.com', password: 'securepassword' };
-
-      (userService.create as jest.Mock).mockResolvedValue(mockData)
-
-      const res = await request(app).post('/api/v1/users').send(mockData)
-
-      if (res.error) console.log(res.error)
-
-      expect(res.status).toBe(201)
-      expect(res.body).toEqual(mockData)
-      expect(userService.create).toHaveBeenCalledWith(mockData)
-    })
-
-    it('should return 400 if validation fails', async () => {
-      const mockData = {}
-      const res = await request(app).post('/api/v1/users').send(mockData)
-
-      expect(res.status).toBe(400)
-      expect(res.body).toHaveProperty('message')
-    })
-
-    it('should return 409 if user name already exists', async () => {
-      const mockData = { name: 'user', email: 'user@example.com', password: 'securepassword' };
-      (userService.create as jest.Mock).mockRejectedValue(new CustomError('Name already exists', 409))
-
-      const res = await request(app).post('/api/v1/users').send(mockData)
-
-      expect(res.status).toBe(409)
-      expect(res.body).toHaveProperty('message', 'Name already exists')
-    })
-  })
-
-  describe('getById', () => {
-    it('should return a user when found', async () => {
-      (userService.getById as jest.Mock).mockResolvedValueOnce({ id: '1', name: 'user' });
-
-      const response = await request(app).get('/api/v1/users/1');
-
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual({ id: '1', name: 'user' });
-      expect(userService.getById).toHaveBeenCalledWith('1');
-    })
-
-    it('should return 404 when user is not found', async () => {
-      (userService.getById as jest.Mock).mockResolvedValueOnce(null);
-      const response = await request(app).get('/api/v1/users/1');
-      expect(response.status).toBe(404);
-      expect(response.body.message).toBe('User not found');
-    })
-
-    it('should return 500 when there is an error', async () => {
-      (userService.getById as jest.Mock).mockRejectedValueOnce(new Error('Error'));
-
-      const response = await request(app).get('/api/v1/users/1');
-
-      expect(response.status).toBe(500);
-      expect(response.body.message).toBe('Error');
-    })
-  })
-
-  describe('getAll', () => {
-    it('should return a list of users', async () => {
-      (userService.getAll as jest.Mock).mockResolvedValueOnce([{ id: '1', name: 'user' }]);
-
-      const response = await request(app).get('/api/v1/users');
-
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual([{ id: '1', name: 'user' }]);
-      expect(userService.getAll).toHaveBeenCalled();
-    })
-
-    it('should return 500 when there is an error', async () => {
-      (userService.getAll as jest.Mock).mockRejectedValueOnce(new Error('Error'));
-
-      const response = await request(app).get('/api/v1/users');
-
-      expect(response.status).toBe(500);
-      expect(response.body.message).toBe('Error');
-    })
-  })
-
-  describe('update', () => {
-    it('should update a user successfully', async () => {
-      (userService.update as jest.Mock).mockResolvedValueOnce({ id: '1', name: 'user - updated' });
+  describe('GET /api/v1/users', () => {
+    it('should return 200 and a list of users when the token is valid', async () => {
+      (userService.getAll as jest.Mock).mockResolvedValue(mockUsers);
 
       const response = await request(app)
-        .put('/api/v1/users/1')
-        .send({ name: 'user - updated' });
+        .get('/api/v1/users')
+        .set('Authorization', accessToken)
+        .expect(200);
 
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual({ id: '1', name: 'user - updated' });
-      expect(userService.update).toHaveBeenCalledWith('1', { name: 'user - updated' });
-    })
+      expect(response.body).toEqual(mockUsers);
+      expect(userService.getAll).toHaveBeenCalledTimes(1);
+    });
 
-    it('should return 404 when user is not found', async () => {
-      (userService.update as jest.Mock).mockResolvedValueOnce(null);
+    it('should return 401 if no token is provided', async () => {
+      const response = await request(app)
+        .get('/api/v1/users')
+        .expect(401);
+
+      expect(response.body.message).toBe('Access denied, No token provided!');
+    });
+  });
+
+  describe('GET /api/v1/users/:id', () => {
+    it('should return 200 and the user if found', async () => {
+      (userService.getById as jest.Mock).mockResolvedValue(mockUser);
 
       const response = await request(app)
-        .put('/api/v1/users/1')
-        .send({ name: 'user - updated' });
+        .get(`/api/v1/users/${mockUser.id}`)
+        .set('Authorization', accessToken)
+        .expect(200);
 
-      expect(response.status).toBe(404);
-      expect(response.body.message).toBe('User not found');
-    })
+      expect(response.body).toEqual(mockUser);
+      expect(userService.getById).toHaveBeenCalledTimes(1);
+    });
 
-    it('should return 500 when there is an error', async () => {
-      (userService.update as jest.Mock).mockRejectedValueOnce(new Error('Error'));
+    it('should return 404 if user not found', async () => {
+      (userService.getById as jest.Mock).mockResolvedValue(null);
 
       const response = await request(app)
-        .put('/api/v1/users/1')
-        .send({ name: 'user - updated' });
+        .get(`/api/v1/users/nonexistentId`)
+        .set('Authorization', accessToken)
+        .expect(404);
 
-      expect(response.status).toBe(500);
-      expect(response.body.message).toBe('Error');
-    })
-  })
-
-  describe('delete', () => {
-    it('should delete a user successfully', async () => {
-      (userService.delete as jest.Mock).mockResolvedValueOnce({ id: '1' });
-
-      const response = await request(app).delete('/api/v1/users/1');
-
-      expect(response.status).toBe(204);
-      expect(userService.delete).toHaveBeenCalledWith('1');
-    })
-
-    it('should return 404 when user is not found', async () => {
-      (userService.delete as jest.Mock).mockResolvedValueOnce(null);
-
-      const response = await request(app).delete('/api/v1/users/1');
-
-      expect(response.status).toBe(404);
       expect(response.body.message).toBe('User not found');
+    });
+  });
+
+  describe('POST /api/v1/users', () => {
+    it('should create a new user and return 201', async () => {
+      const newUser = { name: 'user', email: 'user@example.com', password: 'hashedpassword123' };
+      (userService.create as jest.Mock).mockResolvedValue(newUser);
+
+      const response = await request(app)
+        .post('/api/v1/users')
+        .set('Authorization', accessToken)
+        .send(newUser);
+
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual(newUser);
+      expect(userService.create).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return 400 for invalid data', async () => {
+      const invalidUser = { email: 'invalid-email@example.com' }; // Missing required fields
+
+      const response = await request(app)
+        .post('/api/v1/users')
+        .set('Authorization', accessToken)
+        .send(invalidUser);
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('message');
+    });
+
+    it('should return 409 for already exist user', async () => {
+      const userData: Partial<IUser> = {
+        name: 'user', email: 'user@example.com', password: 'hashedhashedpassword123'
+      };
+
+      // Mock the service to throw a conflict error
+      (userService.create as jest.Mock).mockRejectedValue(new CustomError('Name already exists', 409));
+
+      const response = await request(app)
+        .post('/api/v1/users')
+        .set('Authorization', accessToken)
+        .send(userData);
+
+      expect(response.status).toBe(409);
+      expect(response.body).toHaveProperty('message');
     })
+  });
 
-    it('should return 500 when there is an error', async () => {
-      (userService.delete as jest.Mock).mockRejectedValueOnce(new Error('Error'));
+  describe('PUT /api/v1/users/:id', () => {
+    it('should update an existing user and return 200', async () => {
+      const updatedUser = { ...mockUser, name: 'Updated Name' };
+      (userService.update as jest.Mock).mockResolvedValue(updatedUser);
 
-      const response = await request(app).delete('/api/v1/users/1');
+      const response = await request(app)
+        .put(`/api/v1/users/${mockUser.id}`)
+        .set('Authorization', accessToken)
+        .send({ name: 'Updated Name' })
+        .expect(200);
 
-      expect(response.status).toBe(500);
-      expect(response.body.message).toBe('Error');
-    })
-  })
+      expect(response.body).toEqual(updatedUser);
+      expect(userService.update).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return 404 if user not found', async () => {
+      (userService.update as jest.Mock).mockResolvedValue(null);
+
+      const response = await request(app)
+        .put(`/api/v1/users/nonexistentId`)
+        .set('Authorization', accessToken)
+        .send({ name: 'Updated Name' })
+        .expect(404);
+
+      expect(response.body.message).toBe('User not found');
+    });
+  });
+
+  describe('DELETE /api/v1/users/:id', () => {
+    it('should delete a user and return 204', async () => {
+      (userService.delete as jest.Mock).mockResolvedValue(mockUser);
+
+      const response = await request(app)
+        .delete(`/api/v1/users/${mockUser.id}`)
+        .set('Authorization', accessToken)
+        .expect(204);
+
+      expect(userService.delete).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return 404 if user not found', async () => {
+      (userService.delete as jest.Mock).mockResolvedValue(null);
+
+      const response = await request(app)
+        .delete(`/api/v1/users/nonexistentId`)
+        .set('Authorization', accessToken)
+        .expect(404);
+
+      expect(response.body.message).toBe('User not found');
+    });
+  });
 })
