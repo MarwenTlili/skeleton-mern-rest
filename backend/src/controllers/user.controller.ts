@@ -3,6 +3,7 @@ import userService from '../services/user.service';
 import { createUserSchema, updateUserSchema } from '../validations/user.validation';
 import validate from '../middlewares/validate.middleware';
 import CustomError from '../utils/CustomError';
+import { formatUserDocument } from '../models/user.model';
 
 class UserController {
   // []: middleware composition (eg: validation, authentication, etc.)
@@ -11,7 +12,7 @@ class UserController {
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         const user = await userService.create(req.body);
-        res.status(201).json(user);
+        if (user) res.status(201).json(formatUserDocument(user));
       } catch (error) {
         next(error);
       }
@@ -24,7 +25,7 @@ class UserController {
       if (!user) {
         throw new CustomError('User not found', 404);
       }
-      res.json(user);
+      res.json(formatUserDocument(user));
     } catch (error) {
       next(error);
     }
@@ -33,7 +34,7 @@ class UserController {
   getAll = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const users = await userService.getAll();
-      res.json(users);
+      res.json(users.map(user => formatUserDocument(user)));
     } catch (error) {
       next(error);
     }
@@ -47,7 +48,7 @@ class UserController {
         if (!user) {
           return next(new CustomError('User not found', 404));
         }
-        res.json(user);
+        res.json(formatUserDocument(user));
       } catch (error) {
         next(error);
       }

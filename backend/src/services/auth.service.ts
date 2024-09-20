@@ -7,6 +7,7 @@ import {
 } from '../utils/jwt.util';
 import CustomError from '../utils/CustomError';
 import userService from './user.service';
+import IUser from '../interfaces/user.interface';
 
 export class AuthService {
   static async login(identifier: string, password: string) {
@@ -16,29 +17,37 @@ export class AuthService {
       throw new Error('Invalid identifier or password');
     }
 
-    const accessToken = generateAccessToken(user.id);
-    const refreshToken = generateRefreshToken(user.id);
+    const accessToken = generateAccessToken(user.id, user.roles as string[]);
+    const refreshToken = generateRefreshToken(user.id, user.roles as string[]);
     user.refreshToken = refreshToken; // Store the refresh token in the database
     await user.save();
 
     return { accessToken, refreshToken };
   }
 
-  static async register(name: string, email: string, password: string) {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const userWithPassword = new User({ name, email, password: hashedPassword });
+  static async register(data: IUser) {
+    const hashedPassword = await bcrypt.hash(data.password as string, 10);
+    const userWithPassword = new User({
+      name: data.name,
+      email: data.email,
+      password: hashedPassword,
+      roles: data.roles,
+      isActive: data.isActive
+    });
 
-    if (await User.exists({ name })) {
+    if (await User.exists({ name: data.name })) {
       throw new CustomError('Name already exists', 409)
     }
 
-    if (await User.exists({ email })) {
+    if (await User.exists({ email: data.email })) {
       throw new CustomError('Email already exists', 409);
     }
 
-    const accessToken = generateAccessToken(userWithPassword.id);
-    const refreshToken = generateRefreshToken(userWithPassword.id);
-    userWithPassword.refreshToken = refreshToken; // Store the refresh token in the database
+    const accessToken = generateAccessToken(userWithPassword.id, userWithPassword.roles as string[]);
+    const refreshToken = generateRefreshToken(userWithPassword.id, userWithPassword.roles as string[]);
+
+    // Store the refresh token in the database
+    userWithPassword.refreshToken = refreshToken;
 
     // Omit hashed password from User Object
     const savedUser = await userWithPassword.save();
@@ -57,8 +66,8 @@ export class AuthService {
         throw new Error('Invalid refresh token');
       }
 
-      const newAccessToken = generateAccessToken(user.id);
-      const newRefreshToken = generateRefreshToken(user.id);
+      const newAccessToken = generateAccessToken(user.id, user.roles as string[]);
+      const newRefreshToken = generateRefreshToken(user.id, user.roles as string[]);
       user.refreshToken = newRefreshToken;
       await user.save();
 

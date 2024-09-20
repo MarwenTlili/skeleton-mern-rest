@@ -6,15 +6,15 @@ export const authMiddleware = (
   req: CustomRequest, res: Response, next: NextFunction
 ) => {
   // OR req.cookies.access_token
-  const token = req.header('Authorization')?.replace('Bearer ', '')
+  const accessToken = req.header('Authorization')?.replace('Bearer ', '')
 
-  if (!token) {
+  if (!accessToken) {
     return res.status(401).json({ message: 'Access denied, No token provided!' })
   }
 
   try {
     // decoded: { id: '66c23eeb3735ef18ba9ea68f', iat: 1724668884, exp: 1724672484 }
-    const decoded = verifyAccessToken(token)
+    const decoded = verifyAccessToken(accessToken)
     req.user = decoded
     next()
   } catch (err) {

@@ -6,4 +6,11 @@ export default interface IUser extends Document {
   email?: string;
   password?: string;
   refreshToken?: string;
+  roles?: [string];
+  isActive?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+  lastLoginAt?: Date;
+  profilePicture?: string;
+  __v?: Number;
 }

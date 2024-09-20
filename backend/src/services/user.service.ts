@@ -53,6 +53,7 @@ class UserService implements IUserService {
       const hashedPassword = await hashPassword(password);
       data.password = hashedPassword;
     }
+    data.updatedAt = new Date();
     return await User.findByIdAndUpdate(id, data, { new: true });
   }
 

@@ -1,13 +1,14 @@
 import { Router } from "express";
 import userController from "../controllers/user.controller";
-import { authMiddleware } from "../middlewares/auth.middleware";
+import { authorizedRoles } from "../middlewares/authorizedRoles.middleware";
 
 const router = Router();
 
-router.get('/', authMiddleware, userController.getAll);
-router.get('/:id', authMiddleware, userController.getById);
-router.post('/', authMiddleware, userController.create);
-router.put('/:id', authMiddleware, userController.update);
-router.delete('/:id', authMiddleware, userController.delete);
+router.use(authorizedRoles('ADMIN'));
+router.get('/', userController.getAll);
+router.get('/:id', userController.getById);
+router.post('/', userController.create);
+router.put('/:id', userController.update);
+router.delete('/:id', userController.delete);
 
 export default router;

@@ -14,7 +14,11 @@ export const login = async (req: Request, res: Response) => {
 export const register = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
-    const result = await AuthService.register(name, email, password);
+    if (!name) return res.status(401).json({ message: 'name is required!' })
+    if (!email) return res.status(401).json({ message: 'email is required!' })
+    if (!password) return res.status(401).json({ message: 'password is required!' })
+
+    const result = await AuthService.register(req.body);
     return res.status(201).json(result);
   } catch (error) {
     return res.status(400).json({ message: (error as Error).message });
