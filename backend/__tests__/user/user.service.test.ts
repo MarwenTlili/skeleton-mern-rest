@@ -1,8 +1,8 @@
 import mongoose from 'mongoose'
 
-import User from '../src/models/user.model'
-import UserService from '../src/services/user.service'
-import CustomError from '../src/utils/CustomError'
+import User from '../../src/models/user.model'
+import UserService from '../../src/services/user.service'
+import CustomError from '../../src/utils/CustomError'
 
 describe('UserService', () => {
   describe('create', () => {

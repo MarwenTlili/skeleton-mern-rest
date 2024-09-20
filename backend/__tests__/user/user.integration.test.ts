@@ -1,8 +1,8 @@
 import request from 'supertest'
-import app from '../src/app'
-import { generateAccessToken } from '../src/utils/jwt.util'
-import userService from '../src/services/user.service'
-import IUser from '../src/interfaces/user.interface'
+import app from '../../src/app'
+import { generateAccessToken } from '../../src/utils/jwt.util'
+import userService from '../../src/services/user.service'
+import IUser from '../../src/interfaces/user.interface'
 import mongoose from 'mongoose'
 
 describe('Users API', () => {

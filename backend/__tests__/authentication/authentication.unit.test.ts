@@ -1,17 +1,17 @@
 import bcrypt from 'bcryptjs'
-import User from '../src/models/user.model'
-import userService from '../src/services/user.service'
-import { AuthService } from '../src/services/auth.service'
+import User from '../../src/models/user.model'
+import userService from '../../src/services/user.service'
+import { AuthService } from '../../src/services/auth.service'
 import {
   generateAccessToken,
   generateRefreshToken,
   verifyRefreshToken
-} from '../src/utils/jwt.util'
+} from '../../src/utils/jwt.util'
 
 jest.mock('bcryptjs')
-jest.mock('../src/models/user.model')
-jest.mock('../src/services/user.service')
-jest.mock('../src/utils/jwt.util')
+jest.mock('../../src/models/user.model')
+jest.mock('../../src/services/user.service')
+jest.mock('../../src/utils/jwt.util')
 
 describe('AuthService - Unit Tests', () => {
   afterEach(() => {

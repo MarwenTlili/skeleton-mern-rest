@@ -1,21 +1,21 @@
 import request from 'supertest'
 
-import app from '../src/app'
-import userService from '../src/services/user.service'
-import { generateAccessToken } from '../src/utils/jwt.util'
-import { mockAdminUser, mockUser, mockUsers } from './mocks/user.mocks'
+import app from '../../src/app'
+import userService from '../../src/services/user.service'
+import { generateAccessToken } from '../../src/utils/jwt.util'
+import { mockAdminUser, mockUser, mockUsers } from '../mocks/user.mocks'
 import jwt, { JwtPayload } from 'jsonwebtoken'
-import { JWT_SECRET } from '../src/config/env'
+import { JWT_SECRET } from '../../src/config/env'
 import { NextFunction, Response } from 'express'
-import { CustomRequest } from '../src/types'
-import CustomError from '../src/utils/CustomError'
-import IUser from '../src/interfaces/user.interface'
+import { CustomRequest } from '../../src/types'
+import CustomError from '../../src/utils/CustomError'
+import IUser from '../../src/interfaces/user.interface'
 
 // Mock userService to avoid real database interactions
-jest.mock('../src/services/user.service')
+jest.mock('../../src/services/user.service')
 
 // Mock authorizedRoles to isolate controller logic testing
-jest.mock('../src/middlewares/authorizedRoles.middleware', () => ({
+jest.mock('../../src/middlewares/authorizedRoles.middleware', () => ({
   authorizedRoles: jest.fn((...roles) => (req: CustomRequest, res: Response, next: NextFunction) => {
     const accessToken = req.header('Authorization')?.replace('Bearer ', '')
     if (!accessToken) {

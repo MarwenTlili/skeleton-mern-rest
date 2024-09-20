@@ -1,8 +1,8 @@
 import request from 'supertest'
-import app from '../src/app'
-import User from '../src/models/user.model'
+import app from '../../src/app'
+import User from '../../src/models/user.model'
 import bcrypt from 'bcryptjs'
-import { generateRefreshToken } from '../src/utils/jwt.util'
+import { generateRefreshToken } from '../../src/utils/jwt.util'
 
 describe('AuthService - Integration Tests', () => {
   describe('POST /api/v1/auth/login', () => {
