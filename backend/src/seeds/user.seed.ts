@@ -4,8 +4,20 @@ import { hashPassword } from "../utils/password";
 
 const seedUsers = async () => {
   const users: Partial<IUser>[] = [
-    { name: "admin", email: "admin@example.com", password: await hashPassword("admin") },
-    { name: "user", email: "user@example.com", password: await hashPassword("user") }
+    {
+      name: "admin",
+      email: "admin@example.com",
+      password: await hashPassword("admin"),
+      roles: ["ADMIN"],
+      isActive: true
+    },
+    {
+      name: "user",
+      email: "user@example.com",
+      roles: ["USER"],
+      password: await hashPassword("user"),
+      isActive: false
+    }
   ];
   try {
     console.info("seeding Users ...");
