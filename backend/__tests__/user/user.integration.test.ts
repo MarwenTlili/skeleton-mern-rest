@@ -24,7 +24,9 @@ describe('Users API', () => {
     })
 
     if (admin) {
-      adminAccessToken = generateAccessToken(admin._id, admin.roles as string[])
+      adminAccessToken = generateAccessToken({
+        id: admin._id, roles: admin.roles
+      })
     }
   })
 

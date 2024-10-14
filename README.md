@@ -45,5 +45,5 @@ npm i -D @shelf/jest-mongodb
 # run all tests (under __tests__/*)
 npm test
 # OR a single test file
-npm test -- __tests__/user.integration.test.ts
+npm test -- __tests__/user/user.integration.test.ts
 ```

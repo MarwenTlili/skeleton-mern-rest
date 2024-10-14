@@ -6,3 +6,9 @@ dist
 
 # logging location
 logs
+
+# Ignore all .env.* files
+.env.*
+
+# Allow .env.example
+!.env.example

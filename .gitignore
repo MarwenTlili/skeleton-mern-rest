@@ -6,3 +6,10 @@
 
 # mongdo
 mongo/data
+
+# Ignore all .env.* files
+.env
+.env.*
+
+# Allow .env.example
+!.env.example

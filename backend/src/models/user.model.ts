@@ -5,13 +5,13 @@ const userSchema = new Schema({
   name: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  refreshToken: { type: String, required: false },
+  picture: { type: String, required: false, default: "" },
   roles: { type: [String], required: true, default: ['USER'] },
   isActive: { type: Boolean, required: false, default: false },
   createdAt: { type: Date, required: false, default: Date.now },
   updatedAt: { type: Date, required: false },
   lastLoginAt: { type: Date, required: false },
-  profilePicture: { type: String, required: false, default: "" },
+  refreshToken: { type: String, required: false },
   __v: { type: Number }
 });
 
@@ -21,11 +21,11 @@ export const formatUserDocument = (doc: IUser) => ({
   name: doc.name,
   email: doc.email,
   password: doc.password,
+  picture: doc.picture,
   roles: doc.roles,
   isActive: doc.isActive,
   createdAt: doc.createdAt,
   updatedAt: doc.updatedAt,
-  profilePicture: doc.profilePicture,
   __v: doc.__v
 });
 

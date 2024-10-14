@@ -36,7 +36,7 @@ describe('UserController', () => {
   let adminAccessToken: string
 
   beforeAll(async () => {
-    adminAccessToken = generateAccessToken(mockAdminUser.id, mockAdminUser.roles as string[])
+    adminAccessToken = generateAccessToken({id: mockAdminUser.id, roles: mockAdminUser.roles})
   })
 
   beforeEach(() => {
@@ -84,7 +84,7 @@ describe('UserController', () => {
 
       const response = await request(app)
         .get(`/api/v1/users/nonexistentId`)
-        .set('Authorization', generateAccessToken('wrong_id', ['ADMIN']))
+        .set('Authorization', generateAccessToken({id: 'wrong_id', roles: ['ADMIN']}))
 
       expect(response.status).toBe(404)
       expect(response.body.message).toBe('User not found')

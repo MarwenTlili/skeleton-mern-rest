@@ -49,7 +49,9 @@ describe('AuthService - Integration Tests', () => {
       })
 
       const savedUser = await mockUser.save()
-      const validRefreshToken = generateRefreshToken(savedUser._id.toString(), ['USER'])
+      const validRefreshToken = generateRefreshToken({
+        id: savedUser._id.toString(), name: "user", email: "user@example.com", roles: ['USER']
+      })
       savedUser.refreshToken = validRefreshToken
       await savedUser.save()
 

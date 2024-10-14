@@ -5,12 +5,12 @@ export default interface IUser extends Document {
   name?: string;
   email?: string;
   password?: string;
-  refreshToken?: string;
   roles?: [string];
+  picture?: string;
   isActive?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
   lastLoginAt?: Date;
-  profilePicture?: string;
+  refreshToken?: string;
   __v?: Number;
 }
