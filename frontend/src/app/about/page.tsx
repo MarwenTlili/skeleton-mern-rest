@@ -1,4 +1,4 @@
-import { fetchMetadata } from "@/lib/api";
+import { fetchMetadata } from "@/lib/api/metadata";
 import MetadataCard from "@/ui/MetadataCard";
 
 const AboutPage = async () => {

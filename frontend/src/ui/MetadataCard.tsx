@@ -13,7 +13,7 @@ export type Metadata = {
   contact: Contact;
 }
 
-export default function MetadataCard({ metaData }: { metaData?: Metadata }) {
+export default function MetadataCard({ metaData }: { metaData: Metadata | null }) {
   const { status } = useSession();
   
   if (status === 'loading') {
